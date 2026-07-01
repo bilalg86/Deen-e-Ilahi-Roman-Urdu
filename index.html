@@ -277,7 +277,7 @@
                 </div>
 
                 <button class="btn btn-success" id="btn-export-all">💾 Export Entire Book CSV</button>
-                <button class="btn btn-danger" id="btn-reset-all" style="font-size:0.75rem;padding:6px;margin-top:20px;">Clear Translation Database Cache</button>
+                <button class="btn btn-danger" id="btn-reset-all" style="font-size:0.75rem;padding:6px;margin-top:20px;">Reset Memory Cache</button>
             </div>
         </div>
 
@@ -308,7 +308,6 @@
         const statPercentText = document.getElementById('stat-percent-text');
         const globalBadge = document.getElementById('global-badge');
         
-        // GitHub Input DOM fields
         const ghOwner = document.getElementById('gh-owner');
         const ghRepo = document.getElementById('gh-repo');
         const ghToken = document.getElementById('gh-token');
@@ -316,6 +315,11 @@
         const btnCloudPull = document.getElementById('btn-cloud-pull');
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Check if global vars exist
+            if (typeof CHAPTERS_CONFIG === 'undefined' || typeof PRELOADED_TEXTS === 'undefined') {
+                workspaceContainer.innerHTML = '<div class="empty-state"><p style="color:red; font-weight:bold;">⚠️ Error: book-data.js failed to load.</p><p>Ensure book-data.js is uploaded in the same GitHub directory.</p></div>';
+                return;
+            }
             loadDatabaseCache();
             loadGitHubSettings();
             renderChapterTree();
@@ -323,7 +327,6 @@
             recalculateMetrics();
         });
 
-        // GitHub Storage Handlers
         function loadGitHubSettings() {
             ghOwner.value = localStorage.getItem("gh_sync_owner") || "";
             ghRepo.value = localStorage.getItem("gh_sync_repo") || "";
@@ -336,7 +339,6 @@
             localStorage.setItem("gh_sync_token", ghToken.value.trim());
         }
 
-        // GitHub API Call Engines
         async function getFileSha(owner, repo, token, path) {
             try {
                 let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
@@ -358,18 +360,18 @@
             let path = "translations.json";
 
             if (!owner || !repo || !token) {
-                alert("Please fill out all GitHub Configuration fields first!");
+                alert("Please fill out all GitHub settings!");
                 return;
             }
 
             btnCloudPush.disabled = true;
-            btnCloudPush.textContent = "⏳ Accessing Cloud Repo...";
+            btnCloudPush.textContent = "⏳ Syncing...";
 
             let currentSha = await getFileSha(owner, repo, token, path);
             let contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(userTranslations, null, 2))));
 
             let payload = {
-                message: "Automated incremental update via Roman Urdu translation workbench",
+                message: "Incremental update via workbench",
                 content: contentBase64
             };
             if (currentSha) payload.sha = currentSha;
@@ -385,14 +387,12 @@
                 });
 
                 if (response.ok) {
-                    alert("🎉 Success! Your translations have been committed directly to your GitHub Repository.");
+                    alert("🎉 Success! Translations synced to GitHub.");
                 } else {
                     let err = await response.json();
-                    alert("Cloud Error: " + err.message);
+                    alert("Error: " + err.message);
                 }
-            } catch (e) {
-                alert("Network connectivity failure encountered.");
-            }
+            } catch (e) { alert("Network failure."); }
             btnCloudPush.disabled = false;
             btnCloudPush.textContent = "📤 Push Data to Cloud";
         });
@@ -405,14 +405,12 @@
             let path = "translations.json";
 
             if (!owner || !repo || !token) {
-                alert("Please fill out all GitHub settings!");
+                alert("Please fill out all settings!");
                 return;
             }
 
-            if (!confirm("Pulling from the cloud will completely overwrite your active screen progress. Are you sure?")) return;
-
             btnCloudPull.disabled = true;
-            btnCloudPull.textContent = "⏳ Fetching from Cloud...";
+            btnCloudPull.textContent = "⏳ Pulling...";
 
             try {
                 let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
@@ -427,18 +425,15 @@
                     loadActiveChapter(currentChapterSlug);
                     recalculateMetrics();
                     renderChapterTree();
-                    alert("🎉 Remote cloud data successfully pulled and integrated into your interface panel!");
+                    alert("🎉 Remote data integrated successfully!");
                 } else {
-                    alert("No cloud database file found yet. Try creating data and pushing first!");
+                    alert("No remote translations.json file found.");
                 }
-            } catch (e) {
-                alert("Failed to retrieve cloud resources.");
-            }
+            } catch (e) { alert("Failed to fetch cloud resources."); }
             btnCloudPull.disabled = false;
             btnCloudPull.textContent = "📥 Pull Data from Cloud";
         });
 
-        // Interface Render engines
         function renderChapterTree() {
             treeContainer.innerHTML = '';
             CHAPTERS_CONFIG.forEach((ch, idx) => {
@@ -473,7 +468,7 @@
             const targetItem = document.getElementById('tree-item-' + slug);
             if (targetItem) targetItem.classList.add('active');
             loadActiveChapter(slug);
-            saveGitHubSettings(); // auto snapshot settings on chapter swap
+            saveGitHubSettings();
         }
 
         function loadActiveChapter(slug) {
@@ -627,68 +622,11 @@
 
         function saveDatabaseCache() {
             localStorage.setItem(WORKSPACE_STORAGE_KEY, JSON.stringify(userTranslations));
-            localStorage.setItem(WORKSPACE_STORAGE_KEY + "_texts", JSON.stringify(PRELOADED_TEXTS));
         }
 
         function loadDatabaseCache() {
             const cachedData = localStorage.getItem(WORKSPACE_STORAGE_KEY);
             if (cachedData) { try { userTranslations = JSON.parse(cachedData); } catch (e) { userTranslations = {}; } }
-            const cachedTexts = localStorage.getItem(WORKSPACE_STORAGE_KEY + "_texts");
-            if (cachedTexts) { try { Object.assign(PRELOADED_TEXTS, JSON.parse(cachedTexts)); } catch(e) {} }
-        }
-
-        document.getElementById('btn-reset-all').addEventListener('click', () => {
-            if (confirm('Drop local memory profile?')) {
-                localStorage.removeItem(WORKSPACE_STORAGE_KEY); localStorage.removeItem(WORKSPACE_STORAGE_KEY + "_texts"); window.location.reload();
-            }
-        });
-
-        document.getElementById('btn-export-all').addEventListener('click', () => {
-            const escapeCSV = (text) => { if (text === null || text === undefined) return '""'; return '"' + text.toString().replace(/"/g, '""') + '"'; };
-            let csvRows = []; csvRows.push(['Global ID', 'Chapter Name', 'Chapter Slug', 'Urdu Source Text', 'Roman Urdu Translation'].map(escapeCSV).join(','));
-            let globalIdCounter = 1;
-            CHAPTERS_CONFIG.forEach(ch => {
-                let sentences = PRELOADED_TEXTS[ch.link] ? PRELOADED_TEXTS[ch.link].sentences : [];
-                sentences.forEach((textStr, index) => {
-                    let transVal = (userTranslations[ch.link] && userTranslations[ch.link][index]) ? userTranslations[ch.link][index] : "";
-                    csvRows.push([globalIdCounter++, ch.text, ch.link, textStr, transVal].map(escapeCSV).join(','));
-                });
-            });
-            const blob = new Blob(['\ufeff' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.setAttribute("href", url); link.setAttribute("download", "The_Religion_of_God_Full_RomanUrdu_Database.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        });
-
-        document.getElementById('file-import-all').addEventListener('change', (e) => {
-            const file = e.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const text = evt.target.result; let rows = parseCSV(text); if (rows.length <= 1) { alert('Invalid file layout.'); return; }
-                for(let i = 1; i < rows.length; i++) {
-                    let cols = rows[i];
-                    if (cols.length >= 5) {
-                        let slug = cols[2].trim(); let urduText = cols[3].trim(); let romanText = cols[4].trim();
-                        if (slug && PRELOADED_TEXTS[slug]) {
-                            if (!userTranslations[slug]) userTranslations[slug] = {};
-                            let sIndex = PRELOADED_TEXTS[slug].sentences.indexOf(urduText);
-                            if (sIndex !== -1) { userTranslations[slug][sIndex] = romanText; }
-                        }
-                    }
-                }
-                saveDatabaseCache(); loadActiveChapter(currentChapterSlug); recalculateMetrics(); renderChapterTree(); alert('Database synced!');
-            };
-            reader.readAsText(file);
-        });
-
-        function parseCSV(text) {
-            let p = '', c = '', r = []; let q = false; let row = ['']; if (text.startsWith('\ufeff')) text = text.substring(1);
-            for (let i = 0; i < text.length; i++) {
-                c = text[i]; let next = text[i+1];
-                if (c === '"') { if (q && next === '"') { row[row.length - 1] += '"'; i++; } else { q = !q; } }
-                else if (c === ',' && !q) { row.push(''); }
-                else if ((c === '\r' || c === '\n') && !q) { if (c === '\r' && next === '\n') i++; r.push(row); row = ['']; }
-                else { row[row.length - 1] += c; }
-            }
-            if (row.length > 1 || row[0] !== '') r.push(row); return r;
         }
     </script>
 </body>
