@@ -267,6 +267,11 @@
                     </div>
                 </div>
 
+                <div class="stats-box" style="background:#fff;">
+                    <div class="stats-row"><span>Active Chapter:</span><strong id="active-chapter-name">-</strong></div>
+                    <div class="stats-row"><span>Slug ID:</span><span id="active-chapter-slug" style="font-size:0.75rem;color:var(--text-muted);">-</span></div>
+                </div>
+
                 <div class="stats-box" style="background:#fcfcfc;">
                     <div style="font-size:0.85rem; font-weight:600; margin-bottom:8px; color:var(--primary-color);">☁️ GitHub Sync Configurations</div>
                     <input type="text" id="gh-owner" class="config-input" placeholder="GitHub Username">
@@ -315,7 +320,6 @@
         const btnCloudPull = document.getElementById('btn-cloud-pull');
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Check if global vars exist
             if (typeof CHAPTERS_CONFIG === 'undefined' || typeof PRELOADED_TEXTS === 'undefined') {
                 workspaceContainer.innerHTML = '<div class="empty-state"><p style="color:red; font-weight:bold;">⚠️ Error: book-data.js failed to load.</p><p>Ensure book-data.js is uploaded in the same GitHub directory.</p></div>';
                 return;
@@ -474,8 +478,12 @@
         function loadActiveChapter(slug) {
             const configItem = CHAPTERS_CONFIG.find(c => c.link === slug);
             workspaceTitle.textContent = "Editor: " + (configItem ? configItem.text : slug);
-            document.getElementById('active-chapter-name').textContent = configItem ? configItem.text : "-";
-            document.getElementById('active-chapter-slug').textContent = slug;
+            
+            const nameEl = document.getElementById('active-chapter-name');
+            const slugEl = document.getElementById('active-chapter-slug');
+            if(nameEl) nameEl.textContent = configItem ? configItem.text : "-";
+            if(slugEl) slugEl.textContent = slug;
+            
             workspaceContainer.innerHTML = '';
             
             let hasData = PRELOADED_TEXTS[slug] ? true : false;
@@ -620,14 +628,35 @@
             globalProgress.style.width = percentage + '%'; statSentencesCount.textContent = completedSentences + ' / ' + totalSentences + ' Sentences'; statPercentText.textContent = percentage + '%'; globalBadge.textContent = percentage + '% Compiled';
         }
 
-        function saveDatabaseCache() {
-            localStorage.setItem(WORKSPACE_STORAGE_KEY, JSON.stringify(userTranslations));
-        }
-
+        function saveDatabaseCache() { localStorage.setItem(WORKSPACE_STORAGE_KEY, JSON.stringify(userTranslations)); }
         function loadDatabaseCache() {
             const cachedData = localStorage.getItem(WORKSPACE_STORAGE_KEY);
             if (cachedData) { try { userTranslations = JSON.parse(cachedData); } catch (e) { userTranslations = {}; } }
         }
+
+        const btnResetAll = document.getElementById('btn-reset-all');
+        if(btnResetAll) {
+            btnResetAll.addEventListener('click', () => {
+                if (confirm('Drop local memory profile?')) {
+                    localStorage.removeItem(WORKSPACE_STORAGE_KEY); window.location.reload();
+                }
+            });
+        }
+
+        document.getElementById('btn-export-all').addEventListener('click', () => {
+            const escapeCSV = (text) => { if (text === null || text === undefined) return '""'; return '"' + text.toString().replace(/"/g, '""') + '"'; };
+            let csvRows = []; csvRows.push(['Global ID', 'Chapter Name', 'Chapter Slug', 'Urdu Source Text', 'Roman Urdu Translation'].map(escapeCSV).join(','));
+            let globalIdCounter = 1;
+            CHAPTERS_CONFIG.forEach(ch => {
+                let sentences = PRELOADED_TEXTS[ch.link] ? PRELOADED_TEXTS[ch.link].sentences : [];
+                sentences.forEach((textStr, index) => {
+                    let transVal = (userTranslations[ch.link] && userTranslations[ch.link][index]) ? userTranslations[ch.link][index] : "";
+                    csvRows.push([globalIdCounter++, ch.text, ch.link, textStr, transVal].map(escapeCSV).join(','));
+                });
+            });
+            const blob = new Blob(['\ufeff' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.setAttribute("href", url); link.setAttribute("download", "The_Religion_of_God_Full_RomanUrdu_Database.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        });
     </script>
 </body>
 </html>
