@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Religion of God — Roman Urdu Textbook Compiler</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400..700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --primary-light: #2b6cb0;
+            --secondary-color: #2d3748;
+            --bg-color: #edf2f7;
+            --card-bg: #ffffff;
+            --border-color: #cbd5e0;
+            --success-color: #38a169;
+            --success-bg: #f0fff4;
+            --text-color: #2d3748;
+            --text-muted: #718096;
+            --danger-color: #e53e3e;
+            --urdu-font: 'Noto Nastaliq Urdu', 'Segoe UI', Tahoma, serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        header h1 { font-size: 1.3rem; font-weight: 600; }
+        header p { font-size: 0.85rem; color: #cbd5e0; }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 280px 1fr 300px;
+            flex: 1;
+            height: calc(100vh - 65px);
+            overflow: hidden;
+        }
+
+        .panel {
+            background: #ffffff;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background-color: #f7fafc;
+            padding: 14px 18px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-content { padding: 16px; overflow-y: auto; flex: 1; }
+
+        .stats-box {
+            background: #f7fafc; border: 1px solid var(--border-color);
+            border-radius: 6px; padding: 12px; margin-bottom: 15px;
+        }
+
+        .stats-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; }
+
+        .progress-bar-bg { background-color: #e2e8f0; border-radius: 9999px; height: 8px; overflow: hidden; mt: 5px; }
+        .progress-bar-fill { background-color: var(--success-color); height: 100%; width: 0%; transition: width 0.3s; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; padding: 10px 14px;
+            font-size: 0.85rem; font-weight: 500; border-radius: 6px; cursor: pointer; width: 100%;
+            border: none; margin-bottom: 10px; transition: background 0.2s;
+        }
+
+        .btn-success { background-color: var(--success-color); color: white; }
+        .btn-success:hover { background-color: #2f855a; }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-color); }
+        .btn-outline:hover { background-color: #edf2f7; }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .btn-danger:hover { background-color: #c53030; }
+
+        .tree-menu { border-right: none; border-left: 1px solid var(--border-color); }
+        .tree-list { list-style: none; overflow-y: auto; flex: 1; }
+        
+        .tree-item {
+            padding: 10px 14px; border-bottom: 1px solid #edf2f7; cursor: pointer; font-size: 0.85rem;
+            display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;
+        }
+        .tree-item:hover { background-color: #f7fafc; }
+        .tree-item.active { background-color: #ebf8ff; color: #2b6cb0; font-weight: 600; border-left: 4px solid var(--primary-light); }
+        .tree-item.completed-chapter { border-right: 4px solid var(--success-color); }
+        .chapter-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 9999px; font-weight: 600; }
+
+        .workspace-panel { background: var(--bg-color); }
+        .workspace-content { padding: 20px; overflow-y: auto; flex: 1; }
+
+        .translation-row { background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); overflow: hidden; }
+        .translation-row.active-focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15); }
+        .translation-row.completed { border-left: 4px solid var(--success-color); }
+
+        .row-header-actions { display: flex; gap: 8px; align-items: center; }
+        .btn-row-action { background: transparent; border: 1px solid #e2e8f0; color: var(--text-muted); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
+        .btn-row-action:hover { background-color: #edf2f7; color: var(--primary-light); }
+        .btn-row-delete:hover { color: var(--danger-color); background-color: #fff5f5; }
+
+        .urdu-source { font-family: var(--urdu-font); font-size: 1.7rem; padding: 22px; text-align: right; direction: rtl; line-height: 2.3; word-spacing: 2px; background: #fff; }
+        .roman-input-container { padding: 14px; background-color: #fcfcfc; border-top: 1px dashed #e2e8f0; }
+        .roman-input { width: 100%; padding: 10px 14px; font-size: 1rem; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; }
+        .roman-input:focus { border-color: var(--primary-light); background: #fff; }
+
+        .status-tag { font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 9999px; }
+        .status-tag.pending { background-color: #edf2f7; color: #4a5568; }
+        .status-tag.done { background-color: var(--success-bg); color: #22543d; }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .status-badge-global { font-size: 0.85rem; font-weight: 600; padding: 4px 10px; border-radius: 9999px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <h1>دینِ الٰہی — Full Book Roman Urdu Workspace</h1>
+            <p>Translate the complete book seamlessly in one localized database compiler.</p>
+        </div>
+        <div>
+            <span id="global-badge" class="status-badge-global status-tag pending">0% Compiled</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <div class="panel">
+            <div class="panel-header">Dashboard Operations</div>
+            <div class="panel-content">
+                <div class="stats-box">
+                    <div class="stats-row"><strong>Book Completion Status</strong></div>
+                    <div class="progress-bar-bg"><div id="global-progress" class="progress-bar-fill"></div></div>
+                    <div class="stats-row" style="margin-top:8px;">
+                        <span id="stat-sentences-count">0 / 0 Sentences</span>
+                        <span id="stat-percent-text">0%</span>
+                    </div>
+                </div>
+
+                <div class="stats-box" style="background:#fff;">
+                    <div class="stats-row"><span>Active Chapter Index:</span><strong id="active-chapter-name">-</strong></div>
+                    <div class="stats-row"><span>Active Chapter Slugs:</span><span id="active-chapter-slug" style="font-size:0.75rem;color:var(--text-muted);">-</span></div>
+                </div>
+
+                <button class="btn btn-success" id="btn-export-all">💾 Export Entire Book CSV</button>
+                
+                <div class="file-input-wrapper" style="position:relative;overflow:hidden;">
+                    <button class="btn btn-outline" style="width:100%;">📂 Import Saved Database</button>
+                    <input type="file" id="file-import-all" accept=".csv" style="position:absolute;left:0;top:0;opacity:0;cursor:pointer;width:100%;height:100%;" />
+                </div>
+
+                <button class="btn btn-danger" id="btn-reset-all" style="font-size:0.75rem;padding:6px;margin-top:20px;">Clear Translation Database Cache</button>
+
+                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:20px; padding-top:15px; border-top:1px dashed var(--border-color);">
+                    <strong>Hotkeys Map:</strong>
+                    <ul style="margin-left:15px; margin-top:5px;">
+                        <li><strong>Enter</strong>: Go to next sentence box.</li>
+                        <li><strong>Shift + Enter</strong>: Go back one sentence box.</li>
+                        <li>Auto-saves after every modification loop.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel workspace-panel">
+            <div class="panel-header" id="workspace-title">Active Chapter Workspace</div>
+            <div class="workspace-content" id="workspace-container"></div>
+        </div>
+
+        <div class="panel tree-menu">
+            <div class="panel-header">Book Chapters (~59 Pages)</div>
+            <ul class="tree-list" id="tree-container"></ul>
+        </div>
+
+    </div>
+
+    <script src="book-data.js"></script>
+
+    <script>
+        let userTranslations = {}; 
+        let currentChapterSlug = "front-cover";
+        const WORKSPACE_STORAGE_KEY = "the_religion_of_god_unified_storage_v1";
+
+        const treeContainer = document.getElementById('tree-container');
+        const workspaceContainer = document.getElementById('workspace-container');
+        const workspaceTitle = document.getElementById('workspace-title');
+        const activeChapterName = document.getElementById('active-chapter-name');
+        const activeChapterSlug = document.getElementById('active-chapter-slug');
+        const globalProgress = document.getElementById('global-progress');
+        const statSentencesCount = document.getElementById('stat-sentences-count');
+        const statPercentText = document.getElementById('stat-percent-text');
+        const globalBadge = document.getElementById('global-badge');
+        const btnExportAll = document.getElementById('btn-export-all');
+        const fileImportAll = document.getElementById('file-import-all');
+        const btnResetAll = document.getElementById('btn-reset-all');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadDatabaseCache();
+            renderChapterTree();
+            loadActiveChapter(currentChapterSlug);
+            recalculateMetrics();
+        });
+
+        function renderChapterTree() {
+            treeContainer.innerHTML = '';
+            CHAPTERS_CONFIG.forEach((ch, idx) => {
+                const li = document.createElement('li');
+                li.className = 'tree-item' + (ch.link === currentChapterSlug ? ' active' : '');
+                li.id = 'tree-item-' + ch.link;
+                
+                let textArray = PRELOADED_TEXTS[ch.link] ? PRELOADED_TEXTS[ch.link].sentences : [];
+                let totalCount = textArray.length;
+                
+                let doneCount = 0;
+                if (userTranslations[ch.link]) {
+                    Object.keys(userTranslations[ch.link]).forEach(idx => {
+                        if (userTranslations[ch.link][idx] && userTranslations[ch.link][idx].trim()) doneCount++;
+                    });
+                }
+
+                if (totalCount > 0 && doneCount === totalCount) { li.classList.add('completed-chapter'); }
+
+                let badgeColor = totalCount > 0 ? (doneCount === totalCount ? 'background-color:#c6f6d5;color:#22543d;' : (doneCount > 0 ? 'background-color:#feebc8;color:#744210;' : 'background-color:#edf2f7;color:#4a5568;')) : 'background-color:#e2e8f0;color:#718096;';
+                let badgeLabel = totalCount > 0 ? (doneCount + '/' + totalCount) : 'Empty';
+
+                li.innerHTML = '<span>' + (idx + 1) + '. ' + ch.text + '</span>' + '<span class="chapter-badge" style="' + badgeColor + '">' + badgeLabel + '</span>';
+                li.addEventListener('click', () => { selectChapter(ch.link); });
+                treeContainer.appendChild(li);
+            });
+        }
+
+        function selectChapter(slug) {
+            document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
+            currentChapterSlug = slug;
+            const targetItem = document.getElementById('tree-item-' + slug);
+            if (targetItem) targetItem.classList.add('active');
+            loadActiveChapter(slug);
+        }
+
+        function loadActiveChapter(slug) {
+            const configItem = CHAPTERS_CONFIG.find(c => c.link === slug);
+            workspaceTitle.textContent = "Editor: " + (configItem ? configItem.text : slug);
+            activeChapterName.textContent = configItem ? configItem.text : "-";
+            activeChapterSlug.textContent = slug;
+            workspaceContainer.innerHTML = '';
+            
+            let hasData = PRELOADED_TEXTS[slug] ? true : false;
+            if (!hasData) {
+                workspaceContainer.innerHTML = '<div class="empty-state"><p style="font-size:1.1rem;margin-bottom:8px;">📄 This page is currently empty.</p><p style="font-size:0.85rem;">Markdown contents for this section can be imported or updated later.</p></div>';
+                return;
+            }
+
+            const sentences = PRELOADED_TEXTS[slug].sentences;
+            if (sentences.length === 0) {
+                workspaceContainer.innerHTML = '<div class="empty-state"><p>No text chunks available in this segment.</p></div>';
+                return;
+            }
+
+            if (!userTranslations[slug]) userTranslations[slug] = {};
+
+            sentences.forEach((textStr, index) => {
+                const row = document.createElement('div');
+                let savedValue = userTranslations[slug][index] || "";
+                row.className = 'translation-row ' + (savedValue.trim() ? 'completed' : '');
+                row.id = 'row-' + index;
+
+                var contextualHeaderActions = '<div class="row-header-actions">';
+                contextualHeaderActions += '<span class="status-tag ' + (savedValue.trim() ? 'done' : 'pending') + '" id="badge-' + index + '">' + (savedValue.trim() ? '✓ Completed' : '⏳ Pending') + '</span>';
+                if (index > 0) contextualHeaderActions += '<button class="btn-row-action" onclick="handleMerge(' + index + ', \'above\')">⬆️ Merge Above</button>';
+                if (index < sentences.length - 1) contextualHeaderActions += '<button class="btn-row-action" onclick="handleMerge(' + index + ', \'below\')">⬇️ Merge Below</button>';
+                contextualHeaderActions += '<button class="btn-row-action btn-row-delete" onclick="handleRemove(' + index + ')">🗑️ Remove</button></div>';
+
+                row.innerHTML = 
+                    '<div class="row-header"><span>Sentence #' + (index + 1) + '</span>' + contextualHeaderActions + '</div>' +
+                    '<div class="urdu-source">' + textStr + '</div>' +
+                    '<div class="roman-input-container">' +
+                        '<input type="text" class="roman-input" id="input-' + index + '" value="' + savedValue + '" placeholder="Type customized Roman Urdu translation here..." autocomplete="off" data-index="' + index + '">' +
+                    '</div>';
+
+                const inputEl = row.querySelector('.roman-input');
+                inputEl.addEventListener('input', (e) => {
+                    const idx = parseInt(e.target.dataset.index);
+                    userTranslations[slug][idx] = e.target.value;
+                    saveDatabaseCache();
+                    const badge = document.getElementById('badge-' + idx);
+                    const parentRow = document.getElementById('row-' + idx);
+                    if (e.target.value.trim()) {
+                        badge.textContent = '✓ Completed'; badge.className = 'status-tag done'; parentRow.classList.add('completed');
+                    } else {
+                        badge.textContent = '⏳ Pending'; badge.className = 'status-tag pending'; parentRow.classList.remove('completed');
+                    }
+                    recalculateMetricsOnly();
+                });
+
+                inputEl.addEventListener('focus', () => { row.classList.add('active-focus'); });
+                inputEl.addEventListener('blur', () => { row.classList.remove('active-focus'); updateTreeItemBadge(slug); });
+                
+                inputEl.addEventListener('keydown', (e) => {
+                    const idx = parseInt(e.target.dataset.index);
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        const next = document.getElementById('input-' + (idx + 1));
+                        if (next) { next.focus(); next.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+                    } else if (e.key === 'Enter' && e.shiftKey) {
+                        e.preventDefault();
+                        const prev = document.getElementById('input-' + (idx - 1));
+                        if (prev) { prev.focus(); prev.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+                    }
+                });
+                workspaceContainer.appendChild(row);
+            });
+        }
+
+        window.handleRemove = function(index) {
+            if (!PRELOADED_TEXTS[currentChapterSlug]) return;
+            PRELOADED_TEXTS[currentChapterSlug].sentences.splice(index, 1);
+            let chapterTrans = userTranslations[currentChapterSlug] || {};
+            let newTrans = {};
+            Object.keys(chapterTrans).forEach(k => {
+                let kidx = parseInt(k);
+                if (kidx < index) newTrans[kidx] = chapterTrans[kidx];
+                else if (kidx > index) newTrans[kidx - 1] = chapterTrans[kidx];
+            });
+            userTranslations[currentChapterSlug] = newTrans;
+            saveDatabaseCache(); loadActiveChapter(currentChapterSlug); recalculateMetrics(); renderChapterTree();
+        };
+
+        window.handleMerge = function(index, targetDirection) {
+            if (!PRELOADED_TEXTS[currentChapterSlug]) return;
+            let sentences = PRELOADED_TEXTS[currentChapterSlug].sentences;
+            let chapterTrans = userTranslations[currentChapterSlug] || {};
+
+            if (targetDirection === 'above' && index > 0) {
+                sentences[index - 1] += " " + sentences[index];
+                let t1 = chapterTrans[index - 1] || ""; let t2 = chapterTrans[index] || "";
+                chapterTrans[index - 1] = (t1.trim() + " " + t2.trim()).trim();
+                sentences.splice(index, 1);
+                let newTrans = {};
+                Object.keys(chapterTrans).forEach(k => {
+                    let kidx = parseInt(k);
+                    if (kidx < index) newTrans[kidx] = chapterTrans[kidx];
+                    else if (kidx > index) newTrans[kidx - 1] = chapterTrans[kidx];
+                });
+                userTranslations[currentChapterSlug] = newTrans;
+                saveDatabaseCache(); loadActiveChapter(currentChapterSlug); recalculateMetrics(); renderChapterTree();
+                setTimeout(() => { const inp = document.getElementById('input-' + (index - 1)); if (inp) inp.focus(); }, 60);
+            } else if (targetDirection === 'below' && index < sentences.length - 1) {
+                sentences[index] += " " + sentences[index + 1];
+                let t1 = chapterTrans[index] || ""; let t2 = chapterTrans[index + 1] || "";
+                chapterTrans[index] = (t1.trim() + " " + t2.trim()).trim();
+                sentences.splice(index + 1, 1);
+                let newTrans = {};
+                Object.keys(chapterTrans).forEach(k => {
+                    let kidx = parseInt(k);
+                    if (kidx <= index) newTrans[kidx] = chapterTrans[kidx];
+                    else if (kidx > index + 1) newTrans[kidx - 1] = chapterTrans[kidx];
+                });
+                userTranslations[currentChapterSlug] = newTrans;
+                saveDatabaseCache(); loadActiveChapter(currentChapterSlug); recalculateMetrics(); renderChapterTree();
+                setTimeout(() => { const inp = document.getElementById('input-' + index); if (inp) inp.focus(); }, 60);
+            }
+        };
+
+        function updateTreeItemBadge(slug) {
+            const configIdx = CHAPTERS_CONFIG.findIndex(c => c.link === slug);
+            const targetLi = document.getElementById('tree-item-' + slug);
+            if (configIdx === -1 || !targetLi) return;
+            let textArray = PRELOADED_TEXTS[slug] ? PRELOADED_TEXTS[slug].sentences : [];
+            let totalCount = textArray.length; let doneCount = 0;
+            if (userTranslations[slug]) {
+                Object.keys(userTranslations[slug]).forEach(idx => { if (userTranslations[slug][idx] && userTranslations[slug][idx].trim()) doneCount++; });
+            }
+            if (totalCount > 0 && doneCount === totalCount) { targetLi.classList.add('completed-chapter'); } else { targetLi.classList.remove('completed-chapter'); }
+            let badge = targetLi.querySelector('.chapter-badge');
+            if (badge) {
+                badge.textContent = totalCount > 0 ? (doneCount + '/' + totalCount) : 'Empty';
+                badge.style = totalCount > 0 ? (doneCount === totalCount ? 'background-color:#c6f6d5;color:#22543d;' : (doneCount > 0 ? 'background-color:#feebc8;color:#744210;' : 'background-color:#edf2f7;color:#4a5568;')) : 'background-color:#e2e8f0;color:#718096;';
+            }
+        }
+
+        function recalculateMetrics() {
+            let totalSentences = 0; let completedSentences = 0;
+            CHAPTERS_CONFIG.forEach(ch => {
+                let arr = PRELOADED_TEXTS[ch.link] ? PRELOADED_TEXTS[ch.link].sentences : []; totalSentences += arr.length;
+                if (userTranslations[ch.link]) {
+                    Object.keys(userTranslations[ch.link]).forEach(idx => {
+                        let val = userTranslations[ch.link][idx]; if (parseInt(idx) < arr.length && val && val.trim()) completedSentences++;
+                    });
+                }
+            });
+            let percentage = totalSentences > 0 ? Math.round((completedSentences / totalSentences) * 100) : 0;
+            globalProgress.style.width = percentage + '%'; statSentencesCount.textContent = completedSentences + ' / ' + totalSentences + ' Sentences'; statPercentText.textContent = percentage + '%'; globalBadge.textContent = percentage + '% Compiled';
+            globalBadge.className = 'status-badge-global status-tag ' + (percentage === 100 ? 'done' : 'pending');
+        }
+
+        function recalculateMetricsOnly() {
+            let totalSentences = 0; let completedSentences = 0;
+            CHAPTERS_CONFIG.forEach(ch => {
+                let arr = PRELOADED_TEXTS[ch.link] ? PRELOADED_TEXTS[ch.link].sentences : []; totalSentences += arr.length;
+                if (userTranslations[ch.link]) { Object.keys(userTranslations[ch.link]).forEach(idx => { if (parseInt(idx) < arr.length && userTranslations[ch.link][idx] && userTranslations[ch.link][idx].trim()) completedSentences++; }); }
+            });
+            let percentage = totalSentences > 0 ? Math.round((completedSentences / totalSentences) * 100) : 0;
+            globalProgress.style.width = percentage + '%'; statSentencesCount.textContent = completedSentences + ' / ' + totalSentences + ' Sentences'; statPercentText.textContent = percentage + '%'; globalBadge.textContent = percentage + '% Compiled';
+        }
+
+        function saveDatabaseCache() {
+            localStorage.setItem(WORKSPACE_STORAGE_KEY, JSON.stringify(userTranslations));
+            localStorage.setItem(WORKSPACE_STORAGE_KEY + "_texts", JSON.stringify(PRELOADED_TEXTS));
+        }
+
+        function loadDatabaseCache() {
+            const cachedData = localStorage.getItem(WORKSPACE_STORAGE_KEY);
+            if (cachedData) { try { userTranslations = JSON.parse(cachedData); } catch (e) { userTranslations = {}; } }
+            const cachedTexts = localStorage.getItem(WORKSPACE_STORAGE_KEY + "_texts");
+            if (cachedTexts) { try { Object.assign(PRELOADED_TEXTS, JSON.parse(cachedTexts)); } catch(e) {} }
+        }
+
+        btnResetAll.addEventListener('click', () => {
+            if (confirm('Are you absolutely sure you want to drop your translation cache database?')) {
+                localStorage.removeItem(WORKSPACE_STORAGE_KEY); localStorage.removeItem(WORKSPACE_STORAGE_KEY + "_texts"); window.location.reload();
+            }
+        });
+
+        btnExportAll.addEventListener('click', () => {
+            const escapeCSV = (text) => { if (text === null || text === undefined) return '""'; return '"' + text.toString().replace(/"/g, '""') + '"'; };
+            let csvRows = []; csvRows.push(['Global ID', 'Chapter Name', 'Chapter Slug', 'Urdu Source Text', 'Roman Urdu Translation'].map(escapeCSV).join(','));
+            let globalIdCounter = 1;
+            CHAPTERS_CONFIG.forEach(ch => {
+                let sentences = PRELOADED_TEXTS[ch.link] ? PRELOADED_TEXTS[ch.link].sentences : [];
+                sentences.forEach((textStr, index) => {
+                    let transVal = (userTranslations[ch.link] && userTranslations[ch.link][index]) ? userTranslations[ch.link][index] : "";
+                    csvRows.push([globalIdCounter++, ch.text, ch.link, textStr, transVal].map(escapeCSV).join(','));
+                });
+            });
+            const blob = new Blob(['\ufeff' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.setAttribute("href", url); link.setAttribute("download", "The_Religion_of_God_Full_RomanUrdu_Database.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        });
+
+        fileImportAll.addEventListener('change', (e) => {
+            const file = e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const text = evt.target.result; let rows = parseCSV(text); if (rows.length <= 1) { alert('Invalid layout file.'); return; }
+                if (!confirm('Import translations onto matching data blocks?')) return;
+                for(let i = 1; i < rows.length; i++) {
+                    let cols = rows[i];
+                    if (cols.length >= 5) {
+                        let slug = cols[2].trim(); let urduText = cols[3].trim(); let romanText = cols[4].trim();
+                        if (slug && PRELOADED_TEXTS[slug]) {
+                            if (!userTranslations[slug]) userTranslations[slug] = {};
+                            let sIndex = PRELOADED_TEXTS[slug].sentences.indexOf(urduText);
+                            if (sIndex !== -1) { userTranslations[slug][sIndex] = romanText; }
+                        }
+                    }
+                }
+                saveDatabaseCache(); loadActiveChapter(currentChapterSlug); recalculateMetrics(); renderChapterTree(); alert('Database synchronized!');
+            };
+            reader.readAsText(file);
+        });
+
+        function parseCSV(text) {
+            let p = '', c = '', r = []; let q = false; let row = ['']; if (text.startsWith('\ufeff')) text = text.substring(1);
+            for (let i = 0; i < text.length; i++) {
+                c = text[i]; let next = text[i+1];
+                if (c === '"') { if (q && next === '"') { row[row.length - 1] += '"'; i++; } else { q = !q; } }
+                else if (c === ',' && !q) { row.push(''); }
+                else if ((c === '\r' || c === '\n') && !q) { if (c === '\r' && next === '\n') i++; r.push(row); row = ['']; }
+                else { row[row.length - 1] += c; }
+            }
+            if (row.length > 1 || row[0] !== '') r.push(row); return r;
+        }
+    </script>
+</body>
+</html>
