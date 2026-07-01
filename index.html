@@ -54,7 +54,7 @@
 
         .main-container {
             display: grid;
-            grid-template-columns: 280px 1fr 300px;
+            grid-template-columns: 320px 1fr 300px;
             flex: 1;
             height: calc(100vh - 65px);
             overflow: hidden;
@@ -80,64 +80,163 @@
             align-items: center;
         }
 
-        .panel-content { padding: 16px; overflow-y: auto; flex: 1; }
-
-        .stats-box {
-            background: #f7fafc; border: 1px solid var(--border-color);
-            border-radius: 6px; padding: 12px; margin-bottom: 15px;
+        .panel-content {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
         }
 
-        .stats-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; }
+        .stats-box {
+            background: #f7fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
 
-        .progress-bar-bg { background-color: #e2e8f0; border-radius: 9999px; height: 8px; overflow: hidden; mt: 5px; }
-        .progress-bar-fill { background-color: var(--success-color); height: 100%; width: 0%; transition: width 0.3s; }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar-bg {
+            background-color: #e2e8f0;
+            border-radius: 9999px;
+            height: 8px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-bar-fill {
+            background-color: var(--success-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
 
         .btn {
-            display: inline-flex; align-items: center; justify-content: center; padding: 10px 14px;
-            font-size: 0.85rem; font-weight: 500; border-radius: 6px; cursor: pointer; width: 100%;
-            border: none; margin-bottom: 10px; transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            border: none;
+            margin-bottom: 10px;
+            transition: background 0.2s;
         }
 
         .btn-success { background-color: var(--success-color); color: white; }
         .btn-success:hover { background-color: #2f855a; }
+        .btn-primary { background-color: var(--primary-light); color: white; }
+        .btn-primary:hover { background-color: #2b6cb0; }
         .btn-outline { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-color); }
         .btn-outline:hover { background-color: #edf2f7; }
         .btn-danger { background-color: var(--danger-color); color: white; }
         .btn-danger:hover { background-color: #c53030; }
 
-        .tree-menu { border-right: none; border-left: 1px solid var(--border-color); }
+        .config-input {
+            width: 100%; padding: 6px 10px; font-size: 0.8rem; border: 1px solid var(--border-color);
+            border-radius: 4px; margin-bottom: 8px; outline: none;
+        }
+
+        .tree-menu {
+            border-right: none;
+            border-left: 1px solid var(--border-color);
+        }
+
         .tree-list { list-style: none; overflow-y: auto; flex: 1; }
         
         .tree-item {
-            padding: 10px 14px; border-bottom: 1px solid #edf2f7; cursor: pointer; font-size: 0.85rem;
-            display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;
+            padding: 10px 14px;
+            border-bottom: 1px solid #edf2f7;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
         }
+
         .tree-item:hover { background-color: #f7fafc; }
-        .tree-item.active { background-color: #ebf8ff; color: #2b6cb0; font-weight: 600; border-left: 4px solid var(--primary-light); }
-        .tree-item.completed-chapter { border-right: 4px solid var(--success-color); }
-        .chapter-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 9999px; font-weight: 600; }
+        .tree-item.active {
+            background-color: #ebf8ff;
+            color: #2b6cb0;
+            font-weight: 600;
+            border-left: 4px solid var(--primary-light);
+        }
+        .tree-item.completed-chapter {
+            border-right: 4px solid var(--success-color);
+        }
+
+        .chapter-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
 
         .workspace-panel { background: var(--bg-color); }
         .workspace-content { padding: 20px; overflow-y: auto; flex: 1; }
 
-        .translation-row { background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); overflow: hidden; }
-        .translation-row.active-focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15); }
+        .translation-row {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            overflow: hidden;
+        }
+
+        .translation-row.active-focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+        }
+
         .translation-row.completed { border-left: 4px solid var(--success-color); }
 
         .row-header-actions { display: flex; gap: 8px; align-items: center; }
-        .btn-row-action { background: transparent; border: 1px solid #e2e8f0; color: var(--text-muted); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
+        .btn-row-action {
+            background: transparent; border: 1px solid #e2e8f0; color: var(--text-muted);
+            padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer;
+        }
         .btn-row-action:hover { background-color: #edf2f7; color: var(--primary-light); }
         .btn-row-delete:hover { color: var(--danger-color); background-color: #fff5f5; }
 
-        .urdu-source { font-family: var(--urdu-font); font-size: 1.7rem; padding: 22px; text-align: right; direction: rtl; line-height: 2.3; word-spacing: 2px; background: #fff; }
-        .roman-input-container { padding: 14px; background-color: #fcfcfc; border-top: 1px dashed #e2e8f0; }
-        .roman-input { width: 100%; padding: 10px 14px; font-size: 1rem; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; }
+        .urdu-source {
+            font-family: var(--urdu-font);
+            font-size: 1.7rem;
+            padding: 22px;
+            text-align: right;
+            direction: rtl;
+            line-height: 2.3;
+            word-spacing: 2px;
+            background: #fff;
+        }
+
+        .roman-input-container {
+            padding: 14px; background-color: #fcfcfc; border-top: 1px dashed #e2e8f0;
+        }
+
+        .roman-input {
+            width: 100%; padding: 10px 14px; font-size: 1rem; border: 1px solid #cbd5e0;
+            border-radius: 6px; outline: none;
+        }
         .roman-input:focus { border-color: var(--primary-light); background: #fff; }
 
         .status-tag { font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 9999px; }
         .status-tag.pending { background-color: #edf2f7; color: #4a5568; }
         .status-tag.done { background-color: var(--success-bg); color: #22543d; }
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+
+        .empty-state {
+            text-align: center; padding: 60px 20px; color: var(--text-muted);
+        }
+        
         .status-badge-global { font-size: 0.85rem; font-weight: 600; padding: 4px 10px; border-radius: 9999px; }
     </style>
 </head>
@@ -145,8 +244,8 @@
 
     <header>
         <div>
-            <h1>دینِ الٰہی — Full Book Roman Urdu Workspace</h1>
-            <p>Translate the complete book seamlessly in one localized database compiler.</p>
+            <h1>دینِ الٰہی — Full Book Cloud Translation Workbench</h1>
+            <p>Translate the complete book with integrated, automated GitHub Cloud Sync backups.</p>
         </div>
         <div>
             <span id="global-badge" class="status-badge-global status-tag pending">0% Compiled</span>
@@ -158,6 +257,7 @@
         <div class="panel">
             <div class="panel-header">Dashboard Operations</div>
             <div class="panel-content">
+                
                 <div class="stats-box">
                     <div class="stats-row"><strong>Book Completion Status</strong></div>
                     <div class="progress-bar-bg"><div id="global-progress" class="progress-bar-fill"></div></div>
@@ -167,28 +267,17 @@
                     </div>
                 </div>
 
-                <div class="stats-box" style="background:#fff;">
-                    <div class="stats-row"><span>Active Chapter Index:</span><strong id="active-chapter-name">-</strong></div>
-                    <div class="stats-row"><span>Active Chapter Slugs:</span><span id="active-chapter-slug" style="font-size:0.75rem;color:var(--text-muted);">-</span></div>
+                <div class="stats-box" style="background:#fcfcfc;">
+                    <div style="font-size:0.85rem; font-weight:600; margin-bottom:8px; color:var(--primary-color);">☁️ GitHub Sync Configurations</div>
+                    <input type="text" id="gh-owner" class="config-input" placeholder="GitHub Username">
+                    <input type="text" id="gh-repo" class="config-input" placeholder="Repository Name">
+                    <input type="password" id="gh-token" class="config-input" placeholder="Personal Access Token (PAT)">
+                    <button class="btn btn-primary" id="btn-cloud-push" style="margin-bottom:5px; font-size:0.8rem; padding:8px;">📤 Push Data to Cloud</button>
+                    <button class="btn btn-outline" id="btn-cloud-pull" style="margin-bottom:0; font-size:0.8rem; padding:8px;">📥 Pull Data from Cloud</button>
                 </div>
 
                 <button class="btn btn-success" id="btn-export-all">💾 Export Entire Book CSV</button>
-                
-                <div class="file-input-wrapper" style="position:relative;overflow:hidden;">
-                    <button class="btn btn-outline" style="width:100%;">📂 Import Saved Database</button>
-                    <input type="file" id="file-import-all" accept=".csv" style="position:absolute;left:0;top:0;opacity:0;cursor:pointer;width:100%;height:100%;" />
-                </div>
-
                 <button class="btn btn-danger" id="btn-reset-all" style="font-size:0.75rem;padding:6px;margin-top:20px;">Clear Translation Database Cache</button>
-
-                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:20px; padding-top:15px; border-top:1px dashed var(--border-color);">
-                    <strong>Hotkeys Map:</strong>
-                    <ul style="margin-left:15px; margin-top:5px;">
-                        <li><strong>Enter</strong>: Go to next sentence box.</li>
-                        <li><strong>Shift + Enter</strong>: Go back one sentence box.</li>
-                        <li>Auto-saves after every modification loop.</li>
-                    </ul>
-                </div>
             </div>
         </div>
 
@@ -214,23 +303,142 @@
         const treeContainer = document.getElementById('tree-container');
         const workspaceContainer = document.getElementById('workspace-container');
         const workspaceTitle = document.getElementById('workspace-title');
-        const activeChapterName = document.getElementById('active-chapter-name');
-        const activeChapterSlug = document.getElementById('active-chapter-slug');
         const globalProgress = document.getElementById('global-progress');
         const statSentencesCount = document.getElementById('stat-sentences-count');
         const statPercentText = document.getElementById('stat-percent-text');
         const globalBadge = document.getElementById('global-badge');
-        const btnExportAll = document.getElementById('btn-export-all');
-        const fileImportAll = document.getElementById('file-import-all');
-        const btnResetAll = document.getElementById('btn-reset-all');
+        
+        // GitHub Input DOM fields
+        const ghOwner = document.getElementById('gh-owner');
+        const ghRepo = document.getElementById('gh-repo');
+        const ghToken = document.getElementById('gh-token');
+        const btnCloudPush = document.getElementById('btn-cloud-push');
+        const btnCloudPull = document.getElementById('btn-cloud-pull');
 
         window.addEventListener('DOMContentLoaded', () => {
             loadDatabaseCache();
+            loadGitHubSettings();
             renderChapterTree();
             loadActiveChapter(currentChapterSlug);
             recalculateMetrics();
         });
 
+        // GitHub Storage Handlers
+        function loadGitHubSettings() {
+            ghOwner.value = localStorage.getItem("gh_sync_owner") || "";
+            ghRepo.value = localStorage.getItem("gh_sync_repo") || "";
+            ghToken.value = localStorage.getItem("gh_sync_token") || "";
+        }
+
+        function saveGitHubSettings() {
+            localStorage.setItem("gh_sync_owner", ghOwner.value.trim());
+            localStorage.setItem("gh_sync_repo", ghRepo.value.trim());
+            localStorage.setItem("gh_sync_token", ghToken.value.trim());
+        }
+
+        // GitHub API Call Engines
+        async function getFileSha(owner, repo, token, path) {
+            try {
+                let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+                    headers: { "Authorization": `token ${token}` }
+                });
+                if (response.ok) {
+                    let data = await response.json();
+                    return data.sha;
+                }
+                return null;
+            } catch (e) { return null; }
+        }
+
+        btnCloudPush.addEventListener('click', async () => {
+            saveGitHubSettings();
+            let owner = ghOwner.value.trim();
+            let repo = ghRepo.value.trim();
+            let token = ghToken.value.trim();
+            let path = "translations.json";
+
+            if (!owner || !repo || !token) {
+                alert("Please fill out all GitHub Configuration fields first!");
+                return;
+            }
+
+            btnCloudPush.disabled = true;
+            btnCloudPush.textContent = "⏳ Accessing Cloud Repo...";
+
+            let currentSha = await getFileSha(owner, repo, token, path);
+            let contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(userTranslations, null, 2))));
+
+            let payload = {
+                message: "Automated incremental update via Roman Urdu translation workbench",
+                content: contentBase64
+            };
+            if (currentSha) payload.sha = currentSha;
+
+            try {
+                let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `token ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("🎉 Success! Your translations have been committed directly to your GitHub Repository.");
+                } else {
+                    let err = await response.json();
+                    alert("Cloud Error: " + err.message);
+                }
+            } catch (e) {
+                alert("Network connectivity failure encountered.");
+            }
+            btnCloudPush.disabled = false;
+            btnCloudPush.textContent = "📤 Push Data to Cloud";
+        });
+
+        btnCloudPull.addEventListener('click', async () => {
+            saveGitHubSettings();
+            let owner = ghOwner.value.trim();
+            let repo = ghRepo.value.trim();
+            let token = ghToken.value.trim();
+            let path = "translations.json";
+
+            if (!owner || !repo || !token) {
+                alert("Please fill out all GitHub settings!");
+                return;
+            }
+
+            if (!confirm("Pulling from the cloud will completely overwrite your active screen progress. Are you sure?")) return;
+
+            btnCloudPull.disabled = true;
+            btnCloudPull.textContent = "⏳ Fetching from Cloud...";
+
+            try {
+                let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+                    headers: { "Authorization": `token ${token}` }
+                });
+
+                if (response.ok) {
+                    let data = await response.json();
+                    let decodedData = decodeURIComponent(escape(atob(data.content)));
+                    userTranslations = JSON.parse(decodedData);
+                    saveDatabaseCache();
+                    loadActiveChapter(currentChapterSlug);
+                    recalculateMetrics();
+                    renderChapterTree();
+                    alert("🎉 Remote cloud data successfully pulled and integrated into your interface panel!");
+                } else {
+                    alert("No cloud database file found yet. Try creating data and pushing first!");
+                }
+            } catch (e) {
+                alert("Failed to retrieve cloud resources.");
+            }
+            btnCloudPull.disabled = false;
+            btnCloudPull.textContent = "📥 Pull Data from Cloud";
+        });
+
+        // Interface Render engines
         function renderChapterTree() {
             treeContainer.innerHTML = '';
             CHAPTERS_CONFIG.forEach((ch, idx) => {
@@ -265,24 +473,25 @@
             const targetItem = document.getElementById('tree-item-' + slug);
             if (targetItem) targetItem.classList.add('active');
             loadActiveChapter(slug);
+            saveGitHubSettings(); // auto snapshot settings on chapter swap
         }
 
         function loadActiveChapter(slug) {
             const configItem = CHAPTERS_CONFIG.find(c => c.link === slug);
             workspaceTitle.textContent = "Editor: " + (configItem ? configItem.text : slug);
-            activeChapterName.textContent = configItem ? configItem.text : "-";
-            activeChapterSlug.textContent = slug;
+            document.getElementById('active-chapter-name').textContent = configItem ? configItem.text : "-";
+            document.getElementById('active-chapter-slug').textContent = slug;
             workspaceContainer.innerHTML = '';
             
             let hasData = PRELOADED_TEXTS[slug] ? true : false;
             if (!hasData) {
-                workspaceContainer.innerHTML = '<div class="empty-state"><p style="font-size:1.1rem;margin-bottom:8px;">📄 This page is currently empty.</p><p style="font-size:0.85rem;">Markdown contents for this section can be imported or updated later.</p></div>';
+                workspaceContainer.innerHTML = '<div class="empty-state"><p style="font-size:1.1rem;margin-bottom:8px;">📄 This page is currently empty.</p></div>';
                 return;
             }
 
             const sentences = PRELOADED_TEXTS[slug].sentences;
             if (sentences.length === 0) {
-                workspaceContainer.innerHTML = '<div class="empty-state"><p>No text chunks available in this segment.</p></div>';
+                workspaceContainer.innerHTML = '<div class="empty-state"><p>No sentences found.</p></div>';
                 return;
             }
 
@@ -391,23 +600,6 @@
             }
         };
 
-        function updateTreeItemBadge(slug) {
-            const configIdx = CHAPTERS_CONFIG.findIndex(c => c.link === slug);
-            const targetLi = document.getElementById('tree-item-' + slug);
-            if (configIdx === -1 || !targetLi) return;
-            let textArray = PRELOADED_TEXTS[slug] ? PRELOADED_TEXTS[slug].sentences : [];
-            let totalCount = textArray.length; let doneCount = 0;
-            if (userTranslations[slug]) {
-                Object.keys(userTranslations[slug]).forEach(idx => { if (userTranslations[slug][idx] && userTranslations[slug][idx].trim()) doneCount++; });
-            }
-            if (totalCount > 0 && doneCount === totalCount) { targetLi.classList.add('completed-chapter'); } else { targetLi.classList.remove('completed-chapter'); }
-            let badge = targetLi.querySelector('.chapter-badge');
-            if (badge) {
-                badge.textContent = totalCount > 0 ? (doneCount + '/' + totalCount) : 'Empty';
-                badge.style = totalCount > 0 ? (doneCount === totalCount ? 'background-color:#c6f6d5;color:#22543d;' : (doneCount > 0 ? 'background-color:#feebc8;color:#744210;' : 'background-color:#edf2f7;color:#4a5568;')) : 'background-color:#e2e8f0;color:#718096;';
-            }
-        }
-
         function recalculateMetrics() {
             let totalSentences = 0; let completedSentences = 0;
             CHAPTERS_CONFIG.forEach(ch => {
@@ -445,13 +637,13 @@
             if (cachedTexts) { try { Object.assign(PRELOADED_TEXTS, JSON.parse(cachedTexts)); } catch(e) {} }
         }
 
-        btnResetAll.addEventListener('click', () => {
-            if (confirm('Are you absolutely sure you want to drop your translation cache database?')) {
+        document.getElementById('btn-reset-all').addEventListener('click', () => {
+            if (confirm('Drop local memory profile?')) {
                 localStorage.removeItem(WORKSPACE_STORAGE_KEY); localStorage.removeItem(WORKSPACE_STORAGE_KEY + "_texts"); window.location.reload();
             }
         });
 
-        btnExportAll.addEventListener('click', () => {
+        document.getElementById('btn-export-all').addEventListener('click', () => {
             const escapeCSV = (text) => { if (text === null || text === undefined) return '""'; return '"' + text.toString().replace(/"/g, '""') + '"'; };
             let csvRows = []; csvRows.push(['Global ID', 'Chapter Name', 'Chapter Slug', 'Urdu Source Text', 'Roman Urdu Translation'].map(escapeCSV).join(','));
             let globalIdCounter = 1;
@@ -466,12 +658,11 @@
             const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.setAttribute("href", url); link.setAttribute("download", "The_Religion_of_God_Full_RomanUrdu_Database.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link);
         });
 
-        fileImportAll.addEventListener('change', (e) => {
+        document.getElementById('file-import-all').addEventListener('change', (e) => {
             const file = e.target.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = function(evt) {
-                const text = evt.target.result; let rows = parseCSV(text); if (rows.length <= 1) { alert('Invalid layout file.'); return; }
-                if (!confirm('Import translations onto matching data blocks?')) return;
+                const text = evt.target.result; let rows = parseCSV(text); if (rows.length <= 1) { alert('Invalid file layout.'); return; }
                 for(let i = 1; i < rows.length; i++) {
                     let cols = rows[i];
                     if (cols.length >= 5) {
@@ -483,7 +674,7 @@
                         }
                     }
                 }
-                saveDatabaseCache(); loadActiveChapter(currentChapterSlug); recalculateMetrics(); renderChapterTree(); alert('Database synchronized!');
+                saveDatabaseCache(); loadActiveChapter(currentChapterSlug); recalculateMetrics(); renderChapterTree(); alert('Database synced!');
             };
             reader.readAsText(file);
         });
