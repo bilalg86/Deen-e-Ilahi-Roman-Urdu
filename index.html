@@ -332,15 +332,17 @@
         });
 
         function loadGitHubSettings() {
-            ghOwner.value = localStorage.getItem("gh_sync_owner") || "";
-            ghRepo.value = localStorage.getItem("gh_sync_repo") || "";
-            ghToken.value = localStorage.getItem("gh_sync_token") || "";
+            if(ghOwner) ghOwner.value = localStorage.getItem("gh_sync_owner") || "";
+            if(ghRepo) ghRepo.value = localStorage.getItem("gh_sync_repo") || "";
+            if(ghToken) ghToken.value = localStorage.getItem("gh_sync_token") || "";
         }
 
         function saveGitHubSettings() {
-            localStorage.setItem("gh_sync_owner", ghOwner.value.trim());
-            localStorage.setItem("gh_sync_repo", ghRepo.value.trim());
-            localStorage.setItem("gh_sync_token", ghToken.value.trim());
+            if(ghOwner && ghRepo && ghToken) {
+                localStorage.setItem("gh_sync_owner", ghOwner.value.trim());
+                localStorage.setItem("gh_sync_repo", ghRepo.value.trim());
+                localStorage.setItem("gh_sync_token", ghToken.value.trim());
+            }
         }
 
         async function getFileSha(owner, repo, token, path) {
@@ -356,87 +358,91 @@
             } catch (e) { return null; }
         }
 
-        btnCloudPush.addEventListener('click', async () => {
-            saveGitHubSettings();
-            let owner = ghOwner.value.trim();
-            let repo = ghRepo.value.trim();
-            let token = ghToken.value.trim();
-            let path = "translations.json";
+        if(btnCloudPush) {
+            btnCloudPush.addEventListener('click', async () => {
+                saveGitHubSettings();
+                let owner = ghOwner.value.trim();
+                let repo = ghRepo.value.trim();
+                let token = ghToken.value.trim();
+                let path = "translations.json";
 
-            if (!owner || !repo || !token) {
-                alert("Please fill out all GitHub settings!");
-                return;
-            }
-
-            btnCloudPush.disabled = true;
-            btnCloudPush.textContent = "⏳ Syncing...";
-
-            let currentSha = await getFileSha(owner, repo, token, path);
-            let contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(userTranslations, null, 2))));
-
-            let payload = {
-                message: "Incremental update via workbench",
-                content: contentBase64
-            };
-            if (currentSha) payload.sha = currentSha;
-
-            try {
-                let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-                    method: "PUT",
-                    headers: {
-                        "Authorization": `token ${token}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    alert("🎉 Success! Translations synced to GitHub.");
-                } else {
-                    let err = await response.json();
-                    alert("Error: " + err.message);
+                if (!owner || !repo || !token) {
+                    alert("Please fill out all GitHub settings!");
+                    return;
                 }
-            } catch (e) { alert("Network failure."); }
-            btnCloudPush.disabled = false;
-            btnCloudPush.textContent = "📤 Push Data to Cloud";
-        });
 
-        btnCloudPull.addEventListener('click', async () => {
-            saveGitHubSettings();
-            let owner = ghOwner.value.trim();
-            let repo = ghRepo.value.trim();
-            let token = ghToken.value.trim();
-            let path = "translations.json";
+                btnCloudPush.disabled = true;
+                btnCloudPush.textContent = "⏳ Syncing...";
 
-            if (!owner || !repo || !token) {
-                alert("Please fill out all settings!");
-                return;
-            }
+                let currentSha = await getFileSha(owner, repo, token, path);
+                let contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(userTranslations, null, 2))));
 
-            btnCloudPull.disabled = true;
-            btnCloudPull.textContent = "⏳ Pulling...";
+                let payload = {
+                    message: "Incremental update via workbench",
+                    content: contentBase64
+                };
+                if (currentSha) payload.sha = currentSha;
 
-            try {
-                let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-                    headers: { "Authorization": `token ${token}` }
-                });
+                try {
+                    let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+                        method: "PUT",
+                        headers: {
+                            "Authorization": `token ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(payload)
+                    });
 
-                if (response.ok) {
-                    let data = await response.json();
-                    let decodedData = decodeURIComponent(escape(atob(data.content)));
-                    userTranslations = JSON.parse(decodedData);
-                    saveDatabaseCache();
-                    loadActiveChapter(currentChapterSlug);
-                    recalculateMetrics();
-                    renderChapterTree();
-                    alert("🎉 Remote data integrated successfully!");
-                } else {
-                    alert("No remote translations.json file found.");
+                    if (response.ok) {
+                        alert("🎉 Success! Translations synced to GitHub.");
+                    } else {
+                        let err = await response.json();
+                        alert("Error: " + err.message);
+                    }
+                } catch (e) { alert("Network failure."); }
+                btnCloudPush.disabled = false;
+                btnCloudPush.textContent = "📤 Push Data to Cloud";
+            });
+        }
+
+        if(btnCloudPull) {
+            btnCloudPull.addEventListener('click', async () => {
+                saveGitHubSettings();
+                let owner = ghOwner.value.trim();
+                let repo = ghRepo.value.trim();
+                let token = ghToken.value.trim();
+                let path = "translations.json";
+
+                if (!owner || !repo || !token) {
+                    alert("Please fill out all settings!");
+                    return;
                 }
-            } catch (e) { alert("Failed to fetch cloud resources."); }
-            btnCloudPull.disabled = false;
-            btnCloudPull.textContent = "📥 Pull Data from Cloud";
-        });
+
+                btnCloudPull.disabled = true;
+                btnCloudPull.textContent = "⏳ Pulling...";
+
+                try {
+                    let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+                        headers: { "Authorization": `token ${token}` }
+                    });
+
+                    if (response.ok) {
+                        let data = await response.json();
+                        let decodedData = decodeURIComponent(escape(atob(data.content)));
+                        userTranslations = JSON.parse(decodedData);
+                        saveDatabaseCache();
+                        loadActiveChapter(currentChapterSlug);
+                        recalculateMetrics();
+                        renderChapterTree();
+                        alert("🎉 Remote data integrated successfully!");
+                    } else {
+                        alert("No remote translations.json file found.");
+                    }
+                } catch (e) { alert("Failed to fetch cloud resources."); }
+                btnCloudPull.disabled = false;
+                btnCloudPull.textContent = "📥 Pull Data from Cloud";
+            });
+        }
 
         function renderChapterTree() {
             treeContainer.innerHTML = '';
